@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <time.h>
 #include <pthread.h>
+#include <inttypes.h>
 
 struct sc_DeviceProperties3 sizes;
 
@@ -60,8 +61,8 @@ void cb_dld_event(void *priv, const struct sc_DldEvent *const event_array, size_
         // Detect corrupted event (pulseId out of order)
         if (pulseId < lastPulseId) {
             int64_t pulseDiff = static_cast<int64_t>(pulseId) - static_cast<int64_t>(lastPulseId);
-            printf("Corrupt Event! Last PulseId: %llx, Current PulseId: %llx, Difference: %lld\n",
-                   lastPulseId, pulseId, pulseDiff);
+            printf("Corrupt Event! Last PulseId: %" PRIx64 ", Current PulseId: %" PRIx64 ", Difference: %" PRId64 "\n",
+                lastPulseId, pulseId, pulseDiff);
             totalCorrupt++;
             intervalCorrupt++;
         }
@@ -86,7 +87,7 @@ int main() {
     int pd;
 
     // Initialize device
-    dd = sc_tdc_init_inifile("tdc_gpx3.ini");
+    dd = sc_tdc_init_inifile("config/tdc_gpx3.ini");
     if (dd < 0) {
         char error_description[ERRSTRLEN];
         sc_get_err_msg(dd, error_description);
