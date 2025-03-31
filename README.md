@@ -48,7 +48,7 @@ cd python
 python3 pulseid_regression_checker.py ../data/bulk.txt
 
 # Configure electron event generator
-python3 set_generators.py --num 5
+python3 set_generators.py 5
 ```
 
 ---
