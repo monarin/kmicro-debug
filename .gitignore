@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# Ignore everything in lib/ but allow .so files
+/lib/*
+!/lib/*.so
+!/lib/*.so.*
+
 # Distribution / packaging
 .Python
 build/
