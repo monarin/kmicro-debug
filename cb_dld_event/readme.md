@@ -54,9 +54,9 @@ Interval 6s: 124.9876 kHz, Corrupt: 1 events (0.000800%)
 
 ---
 
-⚙️ Required Files in include/
+## ⚙️ Required Files in include/
 To build user_callbacks_pipe.cc, you need the following header files in the include/ directory:
-
+```
 scTDC_cam.h
 scTDC_cam_types.h
 scTDC_cmos.h
@@ -64,12 +64,13 @@ scTDC_deprecated.h
 scTDC_error_codes.h
 scTDC.h
 scTDC_types.h
+```
 These files can be obtained from the vendor, specifically:
-
+```
 tdc_drivers/scTDC1_centos7_lcls2_v1.3023.13
-
+```
 Once obtained, place them in the include/ directory:
-
+```
 kmicro-debug/
 ├── include/
 │   ├── scTDC_cam.h
@@ -79,10 +80,10 @@ kmicro-debug/
 │   ├── scTDC_error_codes.h
 │   ├── scTDC.h
 │   └── scTDC_types.h
-
-📚 Required Files in lib/
+```
+## 📚 Required Files in lib/
 To link the application correctly, the following shared libraries should be placed in the lib/ directory:
-
+```
 libscDeviceClass45.so
 libscDeviceClass45.so.0
 libscDeviceClass45.so.0.4
@@ -91,14 +92,15 @@ libscTDC.so
 libscTDC.so.1
 libscTDC.so.1.3023
 libscTDC.so.1.3023.13
+```
 These files can be obtained from:
-
+```
 tdc_drivers/scTDC1_centos7_lcls2_v1.3023.13
 
 tdc_drivers/scTDC1_devclass45_centos7_lcls2_v1.3023.13
-
+```
 Once obtained, place them in the lib/ directory:
-
+```
 kmicro-debug/
 ├── lib/
 │   ├── libscDeviceClass45.so
@@ -109,7 +111,7 @@ kmicro-debug/
 │   ├── libscTDC.so.1
 │   ├── libscTDC.so.1.3023
 │   └── libscTDC.so.1.3023.13
-
+```
 ## 📄 Notes
 - Ensure that the required `.so` libraries are in the `lib/` directory.
 - You may need to set the `LD_LIBRARY_PATH` if using dynamically linked libraries:
