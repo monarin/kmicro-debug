@@ -53,7 +53,7 @@ If no regressions are found:
 
 #### 📄 Dependencies
 - `pyserial` package to communicate with the USB device.
-- `DldSimulator` module for controlling the electron event generator.
+- `DldSimulator.py` (from the electron_event_generator module) for controlling the electron event generator.
 
 #### 📊 Usage
 ```bash
