@@ -6,10 +6,21 @@ __pycache__/
 # C extensions
 *.so
 
-# Ignore everything in lib/ but allow .so files
-/lib/*
-!/lib/*.so
-!/lib/*.so.*
+# Ignore all files in include/ and lib/
+include/*
+lib/*
+
+# But keep the placeholder .gitkeep
+!include/.gitkeep
+!lib/.gitkeep
+
+# Ignore DldSimulator.py in the python folder
+python/DldSimulator.py
+
+# Ignore compiled binary and output files in cb_dld_event/
+cb_dld_event/user_callbacks_pipe
+cb_dld_event/user_callbacks_pipe.o
+cb_dld_event/bulk.txt
 
 # Distribution / packaging
 .Python
