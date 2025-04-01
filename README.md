@@ -56,7 +56,7 @@ python3 set_generators.py 5
 ## 📄 Directory Structure
 ```
 kmicro-debug/
-├── cb_dld_event/            # Debugging files for cb_dld_event callback
+├── cb_dld_event/           # Debugging files for cb_dld_event callback
 ├── common/                 # Shared utilities and headers
 ├── include/                # Header files for external libraries
 ├── lib/                    # Compiled and external libraries
@@ -65,7 +65,7 @@ kmicro-debug/
 ├── docs/                   # Documentation and architecture overview
 ├── LICENSE                 # License information
 ├── CONTRIBUTING.md         # Guidelines for contributing
-└── README.md                # Main project documentation
+└── README.md               # Main project documentation
 ```
 
 ---
