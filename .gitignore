@@ -16,6 +16,7 @@ lib/*
 
 # Ignore DldSimulator.py in the python folder
 python/DldSimulator.py
+python/PulseIdReceiver.py
 
 # Ignore compiled binary and output files in cb_dld_event/
 cb_dld_event/user_callbacks_pipe
