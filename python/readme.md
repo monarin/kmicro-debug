@@ -54,6 +54,7 @@ If no regressions are found:
 #### 📄 Dependencies
 - `pyserial` package to communicate with the USB device.
 - `DldSimulator.py` (from the electron_event_generator module) for controlling the electron event generator.
+- `PulseIdReceiver.py` (from the event_receiver_TDC module) for configuring the TDC from ctrl node.
 
 #### 📊 Usage
 ```bash
