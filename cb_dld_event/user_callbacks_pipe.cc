@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <scTDC.h>
 #include <inttypes.h>
 #include <time.h>
@@ -23,10 +24,26 @@ size_t intervalEvents = 0;
 size_t totalCorrupt = 0;
 size_t intervalCorrupt = 0;
 struct timespec startTime, lastIntervalTime;
+bool hasPrintedStartTime = false;
+struct timespec startWallTime;
 
 void print_interval_report() {
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
+
+    // Also get wall-clock time
+    time_t wallNow = time(NULL);
+    struct tm* tm_info = localtime(&wallNow);
+
+    if (!hasPrintedStartTime) {
+        char buffer[64];
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", tm_info);
+        printf("\nMonitoring started — Date: %s\n", buffer);
+        printf("Press Ctrl+C to stop.\n\n");
+        printf("%-8s | %-10s | %-10s | %-10s\n", "Time", "Rate (kHz)", "Corrupt", "Corrupt %");
+        printf("------------------------------------------------------\n");
+        hasPrintedStartTime = true;
+    }
 
     double elapsedInterval = (now.tv_sec - lastIntervalTime.tv_sec) +
                              (now.tv_nsec - lastIntervalTime.tv_nsec) / 1e9;
@@ -34,9 +51,12 @@ void print_interval_report() {
     if (elapsedInterval >= 3.0) {
         double rate = intervalEvents / elapsedInterval;
         double kHz = rate / 1000.0;
-        printf("Interval %.0fs: %.4f kHz, Corrupt: %lu events (%.6f%%)\n",
-               elapsedInterval, kHz, intervalCorrupt,
-               (intervalEvents > 0) ? (100.0 * intervalCorrupt / intervalEvents) : 0.0);
+        double corruptPercent = (intervalEvents > 0) ? (100.0 * intervalCorrupt / intervalEvents) : 0.0;
+
+        char buffer[16];
+        strftime(buffer, sizeof(buffer), "%H:%M:%S", tm_info);
+        printf("%-8s | %10.4f | %10lu | %9.6f%%\n",
+               buffer, kHz, intervalCorrupt, corruptPercent);
 
         intervalEvents = 0;
         intervalCorrupt = 0;
@@ -61,8 +81,16 @@ void cb_dld_event(void *priv, const struct sc_DldEvent *const event_array, size_
         // Detect corrupted event (pulseId out of order)
         if (pulseId < lastPulseId) {
             int64_t pulseDiff = static_cast<int64_t>(pulseId) - static_cast<int64_t>(lastPulseId);
-            printf("Corrupt Event! Last PulseId: %" PRIx64 ", Current PulseId: %" PRIx64 ", Difference: %" PRId64 "\n",
-                lastPulseId, pulseId, pulseDiff);
+            
+            // Get wall-clock time for timestamp
+            time_t wallNow = time(NULL);
+            struct tm* tm_info = localtime(&wallNow);
+            char timeStr[16];
+            strftime(timeStr, sizeof(timeStr), "%H:%M:%S", tm_info);
+
+            printf("[%s] Corrupt Event! Last PulseId: %" PRIx64 ", Current PulseId: %" PRIx64 ", Difference: %" PRId64 "\n",
+                   timeStr, lastPulseId, pulseId, pulseDiff);
+ 
             totalCorrupt++;
             intervalCorrupt++;
         }
