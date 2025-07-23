@@ -38,6 +38,7 @@ cd kmicro-debug
 ```bash
 cd cb_dld_event
 make
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cds/home/m/monarin/kmicro-debug/lib
 ./user_callbacks_pipe
 ```
 
