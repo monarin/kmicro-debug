@@ -65,6 +65,10 @@ void print_interval_report() {
 }
 
 void cb_dld_event(void *priv, const struct sc_DldEvent *const event_array, size_t event_array_len) {
+    // Set this to true for Yves's test (constant all-1s pulse ID)
+    // Set to false for normal advancing pulse ID test
+    const bool checkAllOnes = true;
+
     struct PrivData *priv_data = (struct PrivData *)priv;
     priv_data->cn_dld_events++;
 
@@ -73,33 +77,51 @@ void cb_dld_event(void *priv, const struct sc_DldEvent *const event_array, size_
         const struct sc_DldEvent *obj =
             (const struct sc_DldEvent *)(buffer + j * sizes.dld_event_size);
 
-        uint64_t pulseId = obj->time_tag & 0x00ffffffffffffff;
+        uint64_t pulseId = obj->time_tag;
 
-        // Lock mutex to protect critical section
+        // Lock mutex to protect shared state
         pthread_mutex_lock(&pulseIdMutex);
 
-        // Detect corrupted event (pulseId out of order)
-        if (pulseId < lastPulseId) {
-            int64_t pulseDiff = static_cast<int64_t>(pulseId) - static_cast<int64_t>(lastPulseId);
-            
-            // Get wall-clock time for timestamp
-            time_t wallNow = time(NULL);
-            struct tm* tm_info = localtime(&wallNow);
-            char timeStr[16];
-            strftime(timeStr, sizeof(timeStr), "%H:%M:%S", tm_info);
+        // Case 1: Check against expected value (Yves's test)
+        if (checkAllOnes) {
+            if (pulseId != 0xFFFFFFFFFFFFFFFF) {
+                time_t wallNow = time(NULL);
+                struct tm* tm_info = localtime(&wallNow);
+                char timeStr[16];
+                strftime(timeStr, sizeof(timeStr), "%H:%M:%S", tm_info);
 
-            printf("[%s] Corrupt Event! Last PulseId: %" PRIx64 ", Current PulseId: %" PRIx64 ", Difference: %" PRId64 "\n",
-                   timeStr, lastPulseId, pulseId, pulseDiff);
- 
-            totalCorrupt++;
-            intervalCorrupt++;
+                printf("[%s] ❌ Non-all-1 PulseId Detected! PulseId: 0x%016" PRIx64 "\n", timeStr, pulseId);
+                totalCorrupt++;
+                intervalCorrupt++;
+            }
         }
 
-        lastPulseId = pulseId;
+        // Case 2: Advancing Pulse ID check (your original logic)
+        else {
+            uint64_t maskedPulseId = pulseId & 0x00FFFFFFFFFFFFFF;
+
+            if (maskedPulseId < lastPulseId) {
+                int64_t pulseDiff = static_cast<int64_t>(maskedPulseId) - static_cast<int64_t>(lastPulseId);
+
+                time_t wallNow = time(NULL);
+                struct tm* tm_info = localtime(&wallNow);
+                char timeStr[16];
+                strftime(timeStr, sizeof(timeStr), "%H:%M:%S", tm_info);
+
+                printf("[%s] 🔁 Corrupt Event! Last PulseId: %" PRIx64 ", Current PulseId: %" PRIx64 ", Difference: %" PRId64 "\n",
+                       timeStr, lastPulseId, maskedPulseId, pulseDiff);
+
+                totalCorrupt++;
+                intervalCorrupt++;
+            }
+
+            lastPulseId = maskedPulseId;
+        }
+
         totalEvents++;
         intervalEvents++;
 
-        // Unlock mutex after updating
+        // Unlock mutex
         pthread_mutex_unlock(&pulseIdMutex);
     }
 
